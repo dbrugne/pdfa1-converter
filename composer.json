@@ -1,0 +1,21 @@
+{
+  "name": "eyefinity/pdfa1-converter",
+  "description": "A small service in Silex/PHP to convert PDF files in PDF/A-1 valid documents",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "eyefinity",
+      "email": "europe-technique@eyefinity.com"
+    }
+  ],
+  "require": {
+    "silex/silex": "v1.2.2",
+    "twig/twig": "1.16.*@dev",
+    "symfony/twig-bridge": "3.0.*@dev",
+    "doctrine/dbal": "2.6.*@dev"
+  },
+  "autoload": {
+    "psr-0": { "Eyefinity": "src/" }
+  }
+}
