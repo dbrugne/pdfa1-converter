@@ -58,9 +58,9 @@ $app->post('/convert', function(Request $request) use ($app) {
      */
     // file
     $file = $_FILES['source'];
-    $uniqName = uniqid() . '_' . sha1($file['name']);
-    $inputPath = __DIR__.'/../var/input/'.$uniqName.'.pdf';
-    $outputPath = __DIR__.'/../var/output/'.$uniqName.'.pdf';
+    $uniqName = uniqid() . '_' . sha1($file['name']).'.pdf';
+    $inputPath = __DIR__.'/../var/input/'.$uniqName;
+    $outputPath = __DIR__.'/../var/output/'.$uniqName;
     if (!move_uploaded_file($file['tmp_name'], $inputPath)) {
         return $app->json(array('errorCode' => '1', 'errorMessage' => 'Unable to move uploaded file on server'), 500);
     }
