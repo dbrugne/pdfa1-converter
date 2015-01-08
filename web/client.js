@@ -106,7 +106,7 @@ function onreadystatechangeHandler(evt) {
     }
     if (readyState == 4 && status == '200' && evt.target.responseText) {
         var status = document.getElementById('upload-status');
-        status.innerHTML += '<' + 'br>Success!';
+        status.innerHTML = 'Success!';
         var result = document.getElementById('result');
         result.innerHTML = '<p>The server saw it as:</p><pre>' + evt.target.responseText + '</pre>';
         updateList();
