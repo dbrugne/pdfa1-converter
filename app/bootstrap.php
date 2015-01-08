@@ -22,6 +22,8 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     ),
 ));
 
+$app['gs'] = 'C:\Program Files (x86)\gs\gs9.15\bin\gswin32.exe';
+
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => __DIR__.'/../views',
 ));

@@ -2,15 +2,77 @@
 <html lang="fr">
 <head>
     <meta charset="utf-8">
-    <title>Titre de la page</title>
-    <!-- link rel="stylesheet" href="style.css">
-    <script src="script.js"></script -->
+    <title>PDFA1</title>
+    <style>
+        body {
+            font-size: 12px;
+        }
+        #form-id {
+            border: 1px solid darkgrey;
+            background-color: #eeeeee;
+            padding: 10px;
+            width: 450px;
+        }
+        #file-id {
+            border: 1px solid grey;
+            padding: 5px;
+        }
+        h2 {
+          margin-top: 5px;
+        }
+        #list-id {
+            border: 1px solid darkgrey;
+            background-color: #eeeeee;
+            padding: 10px;
+            margin-top: 15px;
+            display: inline-block;
+        }
+        #list-container table {
+            border: 1px solid grey;
+            padding: 5px;
+        }
+        #list-container table td {
+            border: 1px solid grey;
+            padding: 5px;
+        }
+    </style>
 </head>
 <body>
-<h1>Client de test</h1>
-<form method="post" action="/convert" enctype="multipart/form-data">
-    <input type="file" name="source">
-    <input type="submit">
+<h1>PDFA1 converter</h1>
+<!--
+  By default, we assume Ajax uploads are not supported.
+  Later we'll detect support and change this message if found.
+-->
+<form action="/convert" method="post" enctype="multipart/form-data" id="form-id">
+    <h2>Test client</h2>
+    <p id="support-notice">Your browser does not support Ajax uploads :-(<br/>The form will be submitted as normal.</p>
+    <div>
+        <input id="file-id" type="file" name="source" />
+        <!--
+          Also by default, we disable the upload button.
+          If Ajax uploads are supported we'll enable it.
+        -->
+        <input type="button" value="Upload" id="upload-button-id" disabled="disabled" /></div>
+    <!-- A different field, just for the sake of the example -->
+    <div>
+        <label>Security key: <input name="other-field" type="text" id="other-field-id" value="" /></label>
+    </div>
+    <!-- And finally a submit button -->
+    <div>
+        <input type="submit" value="Submit" />
+    </div>
+    <!-- Placeholders for messages set by event handlers -->
+    <div id="upload-status"></div>
+    <div id="progress"></div>
+    <pre id="result"></pre>
 </form>
+<div id="list-id">
+    <h2>Last conversions</h2>
+    <div id="list-container">
+
+    </div>
+</div>
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="./client.js"></script>
 </body>
 </html>

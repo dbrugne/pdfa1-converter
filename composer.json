@@ -11,9 +11,9 @@
   ],
   "require": {
     "silex/silex": "v1.2.2",
-    "twig/twig": "1.16.*@dev",
-    "symfony/twig-bridge": "3.0.*@dev",
-    "doctrine/dbal": "2.6.*@dev"
+    "twig/twig": "v1.16.3",
+    "symfony/twig-bridge": "v2.6.1",
+    "doctrine/dbal": "v2.5.0"
   },
   "autoload": {
     "psr-0": { "Eyefinity": "src/" }
