@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @todo :
+ * - example CURL
+ */
+
 $filename = __DIR__.preg_replace('#(\?.*)$#', '', $_SERVER['REQUEST_URI']);
 if (php_sapi_name() === 'cli-server' && is_file($filename)) {
     return false;
@@ -7,6 +12,7 @@ if (php_sapi_name() === 'cli-server' && is_file($filename)) {
 
 use Symfony\Component\HttpFoundation\Request;
 use Eyefinity\Model\ConversionManager;
+use Eyefinity\Converter;
 
 $app = include __DIR__.'/../app/bootstrap.php';
 
@@ -56,12 +62,9 @@ $app->post('/convert', function(Request $request) use ($app) {
      * )
      * $_SERVER['REMOTE_ADDR']
      */
-    // file
     $file = $_FILES['source'];
-    $uniqName = uniqid() . '_' . sha1($file['name']).'.pdf';
-    $inputPath = __DIR__.'/../var/input/'.$uniqName;
-    $outputPath = __DIR__.'/../var/output/'.$uniqName;
-    if (!move_uploaded_file($file['tmp_name'], $inputPath)) {
+    $key =  uniqid();
+    if (!move_uploaded_file($file['tmp_name'], $app['input'] . $key . '.pdf')) {
         return $app->json(array('errorCode' => '1', 'errorMessage' => 'Unable to move uploaded file on server'), 500);
     }
 
@@ -72,34 +75,19 @@ $app->post('/convert', function(Request $request) use ($app) {
         'original_size' => $file['size'],
         'original_type' => $file['type'],
         'from_ip'       => $_SERVER['REMOTE_ADDR'],
+        'store_id'       => '', // from post
         'created_at'    => date('Y-m-d H:i:s'),
-        'current_name'  => $uniqName
+        'current_name'  => $key
     ));
 
-    // batch conversion
-    // http://svn.ghostscript.com/ghostscript/trunk/gs/doc/Ps2pdf.htm#PDFA
-    // noir et blanc : http://superuser.com/questions/200378/converting-a-pdf-to-black-white-with-ghostscript
-    if (PHP_OS == 'WINNT') {
-        // Windows
-        $cmd = '"'.$app['gs'].'"';
-        $cmd .= " -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -dUseCIEColor -sProcessColorModel=DeviceGray -sDEVICE=pdfwrite";
-        $cmd .= " -sOutputFile={$outputPath} {$inputPath}";
-    } else {
-        // Linux
-        $cmd = "gs \\
-        -dPDFA \\
-        -dBATCH \\
-        -dNOPAUSE \\
-        -dNOOUTERSAVE \\
-        -dUseCIEColor \\
-        -sProcessColorModel=DeviceGray \\
-        -sDEVICE=pdfwrite \\
-        -sOutputFile=".escapeshellcmd($outputPath)." \\"
-            . escapeshellcmd($inputPath);
+    try {
+        $converter = new Converter($app, $key);
+        $converter->toPDFA1(); // to PDF/A-1b
+        $string = $converter->toBase64(); // to base64
+        return $app->json(array('errorCode' => 0, 'file' => $string), 200);
+    } catch(Exception $e) {
+        return $app->json(array('errorCode' => 1, 'errorMessage' => $e->getMessage()), 500);
     }
-    $output = shell_exec($cmd);
-
-    return $app->json(array('errorCode' => 0), 200); // @todo add base64encoded file
 })
 ->before($before)
 ->after($after);

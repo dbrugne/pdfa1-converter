@@ -22,7 +22,9 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     ),
 ));
 
-$app['gs'] = 'C:\Program Files (x86)\gs\gs9.15\bin\gswin32.exe';
+// configuration
+$app['input'] = __DIR__.'/../var/input/';
+$app['output'] = __DIR__.'/../var/output/';
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => __DIR__.'/../views',
