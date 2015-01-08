@@ -38,7 +38,7 @@ class Converter {
     public function toPDFA1() {
         $from = $this->app['input'] . $this->key . '.pdf';
         $to = $this->app['output'] . $this->key . '.pdf';
-        $cmd = $this->_cmd(" -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite -sColorConversionStrategy=/Mono -sColorConversionStrategyForImages=/Mono -dUseCIEColor -sProcessColorModel=/DeviceGray", $from, $to); // -dUseCIEColor -sProcessColorModel=DeviceGray
+        $cmd = $this->_cmd(" -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite -sColorConversionStrategy=Mono -sColorConversionStrategyForImages=Mono -dUseCIEColor -sProcessColorModel=DeviceGray", $from, $to); // -dUseCIEColor -sProcessColorModel=DeviceGray
         $this->_exec($cmd);
     }
 
