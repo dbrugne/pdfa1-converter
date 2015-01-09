@@ -12,8 +12,9 @@ if (php_sapi_name() === 'cli-server' && is_file($filename)) {
 }
 
 use Symfony\Component\HttpFoundation\Request;
-use Eyefinity\Model\ConversionManager;
-use Eyefinity\Converter;
+use Eyefinity\Model\ConversionManager,
+    Eyefinity\Converter,
+    Eyefinity\Validator;
 
 $app = include __DIR__.'/../app/bootstrap.php';
 
@@ -38,9 +39,16 @@ $app->get('/list', function() use($app) {
     ));
     $clean = array();
     foreach($raw as $item) {
-        $clean[] = $item->getData();
+        $newItem = $item->getData();
+        $newItem['current_path'] = $app['output'].$item->getCurrentName().'.pdf';
+        $clean[] = $newItem;
     }
     return $app->json($clean, 200);
+});
+$app->get('/validate/{file}', function($file) use($app) {
+    $filepath = $app['output'].$file.'.pdf';
+    $validator = new Validator($app, $filepath);
+    return $app->json(array('file' => $filepath, 'validation' => $validator->validatePDFA1()), 200);
 });
 
 /**

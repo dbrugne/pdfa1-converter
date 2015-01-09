@@ -28,8 +28,7 @@ class Converter {
     }
 
     protected function _exec($cmd) {
-        $output = shell_exec($cmd);
-        // $output?
+        return shell_exec($cmd);
     }
 
     /**
@@ -38,8 +37,8 @@ class Converter {
     public function toPDFA1() {
         $from = $this->app['input'] . $this->key . '.pdf';
         $to = $this->app['output'] . $this->key . '.pdf';
-        $cmd = $this->_cmd(" -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite -sColorConversionStrategy=Mono -sColorConversionStrategyForImages=Mono -dUseCIEColor -sProcessColorModel=DeviceGray", $from, $to); // -dUseCIEColor -sProcessColorModel=DeviceGray
-        $this->_exec($cmd);
+        $cmd = $this->_cmd(" -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite -sColorConversionStrategy=Mono -sColorConversionStrategyForImages=Mono -dUseCIEColor -sProcessColorModel=DeviceGray", $from, $to);
+        return $this->_exec($cmd);
     }
 
     public function toBase64() {

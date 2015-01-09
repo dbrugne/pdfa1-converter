@@ -123,10 +123,10 @@ function updateList() {
         if (!list.length)
           return;
 
-        var html = '<table><thead><tr><td>id</td><td>original_name</td><td>original_size</td><td>original_type</td><td>current_name</td><td>from_ip</td><td>created_at</td></tr></thead><tbody>';
+        var html = '<table><thead><tr><td>id</td><td>original_name</td><td>original_size</td><td>original_type</td><td>current_name</td><td>current_path</td><td>validation</td><td>from_ip</td><td>created_at</td></tr></thead><tbody>';
         for(var i=0; i<list.length; i++) {
             var item = list[i];
-            html += '<tr><td>'+item.id+'</td><td>'+item.original_name+'</td><td>'+item.original_size+'</td><td>'+item.original_type+'</td><td>'+item.current_name+'</td><td>'+item.from_ip+'</td><td>'+item.created_at+'</td></tr>';
+            html += '<tr><td>'+item.id+'</td><td>'+item.original_name+'</td><td>'+item.original_size+'</td><td>'+item.original_type+'</td><td>'+item.current_name+'</td><td>'+item.current_path+'</td><td><a href="#_" class="validate" data-current-name="'+item.current_name+'">valid</a></td><td>'+item.from_ip+'</td><td>'+item.created_at+'</td></tr>';
         }
 
         html += '</tbody></table>';
@@ -136,5 +136,31 @@ function updateList() {
 }
 
 $(document).on('ready', function() {
+    $("#list-container").delegate("a.validate", "click", function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var current_name = $(event.currentTarget).data('currentName');
+        console.log('validate '+current_name);
+        $.ajax({
+            url: "/validate/"+current_name,
+            context: document.body
+        }).done(function(data, state, res) {
+            if (state != 'success')
+                return console.log(state, res);
+            console.log(data.validation.result);
+            var html;
+            if (data.validation.result) {
+                html = 'ok';
+            } else {
+                if (!data.validation.length)
+                    html = 'not exists';
+                else
+                    html = 'not valid';
+            }
+            $(event.currentTarget).closest('td').html(html);
+        });
+    });
+
+    // load list
     updateList();
 });
