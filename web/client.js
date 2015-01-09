@@ -106,9 +106,17 @@ function onreadystatechangeHandler(evt) {
     }
     if (readyState == 4 && status == '200' && evt.target.responseText) {
         var status = document.getElementById('upload-status');
-        status.innerHTML = 'Success!';
         var result = document.getElementById('result');
-        result.innerHTML = '<p>The server saw it as:</p><pre>' + evt.target.responseText + '</pre>';
+
+        var data = JSON.parse(evt.target.responseText);
+        if (data.errorCode != 0) {
+            status.innerHTML = 'Error!';
+            result.innerHTML = '<div>Error</div><div class="output">' + evt.target.responseText + '</div>';
+            return;
+        }
+
+        status.innerHTML = 'Success!';
+        result.innerHTML = '<label> Base64: <textarea class="output">'+data.file+'</textarea></label>';
         updateList();
     }
 }
@@ -141,6 +149,7 @@ $(document).on('ready', function() {
         event.stopPropagation();
         var current_name = $(event.currentTarget).data('currentName');
         console.log('validate '+current_name);
+        $(event.currentTarget).closest('td').html('wait');
         $.ajax({
             url: "/validate/"+current_name,
             context: document.body
