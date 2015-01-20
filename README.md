@@ -9,10 +9,8 @@ A small service in Silex/PHP to convert PDF files in PDF/A-1 valid documents.
 * for validation a functionnal JHOVE deployment: http://jhove.sourceforge.net/index.html
 
 # Todo
-* add file download link on client
-* repair client
 * introduce console and add test on full file list
-* change log to create entry on file receiving, update it after conversion and log error if necessary 
+* MySQL autoclean (<1month)
 
 # API
 
