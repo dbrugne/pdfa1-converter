@@ -5,5 +5,9 @@ composer.phar
 vendor/
 composer.lock
 
+# test
+test/samples/
+test/temp.*
+
 # var files
 var/
