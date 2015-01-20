@@ -47,31 +47,24 @@
   By default, we assume Ajax uploads are not supported.
   Later we'll detect support and change this message if found.
 -->
-<form method="post" enctype="multipart/form-data" id="form-id">
+<!-- form method="post" enctype="multipart/form-data" id="form-id">
     <h2>Test client</h2>
     <p id="support-notice">Your browser does not support Ajax uploads :-(<br/>The form will be submitted as normal.</p>
     <div>
         <input id="file-id" type="file" name="source" />
         <input type="hidden" name="key" value="cledetestsecurite" />
         <input type="hidden" name="store_id" value="44x" />
-        <!--
-          Also by default, we disable the upload button.
-          If Ajax uploads are supported we'll enable it.
-        -->
         <input type="button" value="Upload" id="upload-button-id" disabled="disabled" /></div>
-    <!-- A different field, just for the sake of the example -->
     <div style="display: none;">
         <label>Security key: <input name="other-field" type="text" id="other-field-id" value="" /></label>
     </div>
-    <!-- And finally a submit button -->
     <div>
         <input style="display: none;" type="submit" value="Submit" />
     </div>
-    <!-- Placeholders for messages set by event handlers -->
     <div id="upload-status"></div>
     <div id="progress"></div>
     <div id="result"></div>
-</form>
+</form -->
 <div id="list-id">
     <h2>Last 10 conversions <small>(<a href='#' class="refresh">refresh</a>)</small></h2>
     <div id="list-container"></div>

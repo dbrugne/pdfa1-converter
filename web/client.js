@@ -22,18 +22,18 @@ function supportAjaxUploadWithProgress() {
     }
 }
 // Actually confirm support
-if (supportAjaxUploadWithProgress()) {
-    // Ajax uploads are supported!
-    // Change the support message and enable the upload button
-    var notice = document.getElementById('support-notice');
-    var uploadBtn = document.getElementById('upload-button-id');
-    notice.innerHTML = "Your browser supports HTML uploads. Go try me! :-)";
-    uploadBtn.removeAttribute('disabled');
-    //// Init the Ajax form submission
-    //initFullFormAjaxUpload();
-    // Init the single-field file upload
-    initFileOnlyAjaxUpload();
-}
+//if (supportAjaxUploadWithProgress()) {
+//    // Ajax uploads are supported!
+//    // Change the support message and enable the upload button
+//    var notice = document.getElementById('support-notice');
+//    var uploadBtn = document.getElementById('upload-button-id');
+//    notice.innerHTML = "Your browser supports HTML uploads. Go try me! :-)";
+//    uploadBtn.removeAttribute('disabled');
+//    //// Init the Ajax form submission
+//    //initFullFormAjaxUpload();
+//    // Init the single-field file upload
+//    initFileOnlyAjaxUpload();
+//}
 //function initFullFormAjaxUpload() {
 //    var form = document.getElementById('form-id');
 //    form.onsubmit = function() {
