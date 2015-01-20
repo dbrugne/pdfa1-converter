@@ -22,7 +22,7 @@ $app->get('/', function() use($app) {
 $app->get('/list', function() use($app) {
     $conversionManager = new ConversionManager($app);
     $raw = $conversionManager->findBy(array(), array(
-        'order_by' => array('created_at', 'DESC'),
+        'order_by' => array('date', 'DESC'),
         'limit' => array(0, 10)
     ));
     $clean = array();
@@ -42,60 +42,74 @@ $app->get('/validate/{file}', function($file) use($app) {
 /**
  * Webservice
  */
-$before = function(Request $request) use ($app) {
-    $key = $request->request->get('key');
-    if (!$key || $app['key'] !== $key)
-        return $app->json(array('errorCode' => 1, 'errorMessage' => "Security key not found or mismatch"), 403);
-
-    if (!$request->files->has('source'))
-        return $app->json(array('errorCode' => 1, 'errorMessage' => 'POST request should contains a "source" param'), 400);
-
-    $app['start'] = microtime(true);
-};
-$after = function(Request $request, Response $response) use ($app) {
-    // duration
-    $duration = (microtime(true) - $app['start']); // in ms
-    $app['duration'] = round($duration, 2);
-
-    // log in database
-    $file = $request->files->get('source');
-    $conversionManager = new ConversionManager($app);
-    // @doc: http://api.symfony.com/2.0/Symfony/Component/HttpFoundation/File/UploadedFile.html
-    $id = $conversionManager->insert(array(
-        'original_name' => $file->getClientOriginalName(),
-        'original_size' => $file->getClientSize(),
-        'original_type' => $file->getClientMimeType(),
-        'from_ip'       => $request->server->get('REMOTE_ADDR'),
-        'store_id'      => ($request->request->has('store_id')) ? $request->request->get('store_id') : null,
-        'duration'    => $duration,
-        'created_at'    => date('Y-m-d H:i:s'),
-        'current_name'  => $app['unique']
-    ));
-};
 // GET request handler
-$app->get('/convert', function(Request $request) use ($app) {
-    return $app->json(array('errorCode' => 1, 'errorMessage' => 'GET request are not allowed (use POST instead)'), 405);
+$error = function($msg, $code = 500) use ($app) {
+    $app['cm']->update(array( 'error' => $msg ), array( 'id' => $app['request_id'] ));
+    return $app->json(array('errorCode' => 1, 'errorMessage' => $msg), $code);
+};
+$app->get('/convert', function(Request $request) use ($app, $error) {
+    return $error('GET request are not allowed (use POST instead)', 405);
 });
 // POST request handler
-$app->post('/convert', function(Request $request) use ($app) {
+$before = function(Request $request) use ($app, $error) {
+    $key = $request->request->get('key');
+    if (!$key || $app['key'] !== $key)
+        return $error('Security key not found or mismatch', 403);
+
+    if (!$request->files->has('source'))
+        return $error('POST request should contains a "source" param', 400);
+
+    // generate unique name for this request
+    $app['request_local'] = uniqid();
+
+    // create request log
     $file = $request->files->get('source');
-    $app['unique'] = uniqid();
+    $app['cm'] = new ConversionManager($app);
+    // @doc: http://api.symfony.com/2.0/Symfony/Component/HttpFoundation/File/UploadedFile.html
+    $app['request_id'] = $app['cm']->insert(array(
+        'local_name'     => $app['request_local'],
+        'date'           => date('Y-m-d H:i:s'),
+        'from_store_id'  => ($request->request->has('store_id')) ? $request->request->get('store_id') : null,
+        'from_ip'        => $request->server->get('REMOTE_ADDR'),
+        'original_name'  => $file->getClientOriginalName(),
+        'original_type'  => $file->getClientMimeType(),
+        'original_size'  => $file->getClientSize(), // in octets
+    ));
+
+    // duration
+    $app['start'] = microtime(true);
+};
+$post = function(Request $request) use ($app, $error) {
+    $file = $request->files->get('source');
 
     try {
-        $localFile = $file->move($app['input'],  $app['unique'] . '.pdf');
+        $localFile = $file->move($app['input'],  $app['request_local'] . '.pdf');
     } catch (Exception $e) {
-        return $app->json(array('errorCode' => '1', 'errorMessage' => 'Unable to move uploaded file on server'), 500);
+        return $error('Unable to move uploaded file on server', 500);
     }
 
     try {
-        $converter = new Converter($app, $app['unique']);
+        $converter = new Converter($app, $app['request_local']);
         $converter->toPDFA1(); // to PDF/A-1b
         $string = $converter->toBase64();
         return new Response($string, 200);
     } catch(Exception $e) {
-        return $app->json(array('errorCode' => 1, 'errorMessage' => $e->getMessage()), 500);
+        return $error($e->getMessage(), 500);
     }
-})
+};
+$after = function(Request $request, Response $response) use ($app, $error) {
+    // duration
+    $duration = (microtime(true) - $app['start']);
+
+    // log in database
+    $data = array(
+        'duration' => round($duration, 4), // in ms
+        'success'  => 1,
+    );
+    $app['cm']->update($data, array( 'id' => $app['request_id'] ));
+};
+
+$app->post('/convert', $post)
 ->before($before)
 ->after($after);
 

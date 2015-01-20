@@ -1,15 +1,18 @@
 CREATE TABLE `conversions` (
 	`id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-	`original_name` VARCHAR(255) NOT NULL,
-	`original_size` INT(10) UNSIGNED NOT NULL,
-	`original_type` VARCHAR(255) NOT NULL,
-	`from_ip` VARCHAR(255) NOT NULL,
-	`store_id` VARCHAR(255) NOT NULL,
-	`current_name` VARCHAR(255) NOT NULL,
-	`created_at` DATETIME NOT NULL,
+	`local_name` VARCHAR(255) NOT NULL,
+	`date` DATETIME NOT NULL,
+	`from_store_id` VARCHAR(255) NULL DEFAULT NULL,
+	`from_ip` VARCHAR(255) NULL DEFAULT NULL,
+	`original_name` VARCHAR(255) NULL DEFAULT NULL,
+	`original_type` VARCHAR(255) NULL DEFAULT NULL,
+	`original_size` INT(10) UNSIGNED NULL DEFAULT NULL,
+	`duration` FLOAT NULL DEFAULT NULL,
+	`success` TINYINT(4) NULL DEFAULT NULL,
+	`error` TEXT NULL,
 	PRIMARY KEY (`id`)
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
-AUTO_INCREMENT=24
+AUTO_INCREMENT=63
 ;
