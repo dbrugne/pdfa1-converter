@@ -14,5 +14,5 @@ CREATE TABLE `conversions` (
 )
 COLLATE='utf8_general_ci'
 ENGINE=InnoDB
-AUTO_INCREMENT=63
+AUTO_INCREMENT=1
 ;
