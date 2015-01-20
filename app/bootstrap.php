@@ -7,7 +7,8 @@ use
     Symfony\Component\HttpFoundation\Response;
 
 use
-    Eyefinity\Application;
+    Eyefinity\Application,
+    Eyefinity\Model\ConversionManager;
 
 $app = new Application;
 $app['debug'] = true;
@@ -26,6 +27,7 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
 $app['input'] = __DIR__.'/../var/input/';
 $app['output'] = __DIR__.'/../var/output/';
 $app['key'] = 'cledetestsecurite';
+$app['cm'] = new ConversionManager($app);
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => __DIR__.'/../views',

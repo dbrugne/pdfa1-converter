@@ -7,8 +7,7 @@ if (php_sapi_name() === 'cli-server' && is_file($filename)) {
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Eyefinity\Model\ConversionManager,
-    Eyefinity\Converter,
+use Eyefinity\Converter,
     Eyefinity\Validator;
 
 $app = include __DIR__.'/../app/bootstrap.php';
@@ -20,8 +19,7 @@ $app->get('/', function() use($app) {
     return $app['twig']->render('client.twig', array());
 });
 $app->get('/list', function() use($app) {
-    $conversionManager = new ConversionManager($app);
-    $raw = $conversionManager->findBy(array(), array(
+    $raw = $app['cm']->findBy(array(), array(
         'order_by' => array('date', 'DESC'),
         'limit' => array(0, 10)
     ));
@@ -43,49 +41,49 @@ $app->get('/validate/{file}', function($file) use($app) {
  * Webservice
  */
 // GET request handler
-$error = function($msg, $code = 500) use ($app) {
-    $app['cm']->update(array( 'error' => $msg ), array( 'id' => $app['request_id'] ));
-    return $app->json(array('errorCode' => 1, 'errorMessage' => $msg), $code);
-};
-$app->get('/convert', function(Request $request) use ($app, $error) {
-    return $error('GET request are not allowed (use POST instead)', 405);
+$app->get('/convert', function(Request $request) use ($app) {
+    return $app->json(array('errorCode' => 1, 'errorMessage' => 'GET request are not allowed (use POST instead)'), 405);
 });
 // POST request handler
-$before = function(Request $request) use ($app, $error) {
+$before = function(Request $request) use ($app) {
     $key = $request->request->get('key');
-    if (!$key || $app['key'] !== $key)
-        return $error('Security key not found or mismatch', 403);
-
+    if (!$key)
+        return $app->json(array('errorCode' => 1, 'errorMessage' => 'Security key not found'), 403);
+    if ($app['key'] !== $key)
+        return $app->json(array('errorCode' => 1, 'errorMessage' => 'Security key mismatch'), 403);
     if (!$request->files->has('source'))
-        return $error('POST request should contains a "source" param', 400);
+        return $app->json(array('errorCode' => 1, 'errorMessage' => 'POST request should contains a "source" param'), 400);
 
     // generate unique name for this request
     $app['request_local'] = uniqid();
 
     // create request log
     $file = $request->files->get('source');
-    $app['cm'] = new ConversionManager($app);
-    // @doc: http://api.symfony.com/2.0/Symfony/Component/HttpFoundation/File/UploadedFile.html
-    $app['request_id'] = $app['cm']->insert(array(
-        'local_name'     => $app['request_local'],
-        'date'           => date('Y-m-d H:i:s'),
-        'from_store_id'  => ($request->request->has('store_id')) ? $request->request->get('store_id') : null,
-        'from_ip'        => $request->server->get('REMOTE_ADDR'),
-        'original_name'  => $file->getClientOriginalName(),
-        'original_type'  => $file->getClientMimeType(),
-        'original_size'  => $file->getClientSize(), // in octets
-    ));
+    try {
+        // @doc: http://api.symfony.com/2.0/Symfony/Component/HttpFoundation/File/UploadedFile.html
+        $app['request_id'] = $app['cm']->insert(array(
+            'local_name'     => $app['request_local'],
+            'date'           => date('Y-m-d H:i:s'),
+            'from_store_id'  => ($request->request->has('store_id')) ? $request->request->get('store_id') : null,
+            'from_ip'        => $request->server->get('REMOTE_ADDR'),
+            'original_name'  => $file->getClientOriginalName(),
+            'original_type'  => $file->getClientMimeType(),
+            'original_size'  => $file->getClientSize(), // in octets
+        ));
+    } catch (Exception $e) {
+        return $app->json(array('errorCode' => 1, 'errorMessage' => 'Error while saving in database: '.$e), 400);
+    }
 
     // duration
     $app['start'] = microtime(true);
 };
-$post = function(Request $request) use ($app, $error) {
+$post = function(Request $request) use ($app) {
     $file = $request->files->get('source');
 
     try {
         $localFile = $file->move($app['input'],  $app['request_local'] . '.pdf');
     } catch (Exception $e) {
-        return $error('Unable to move uploaded file on server', 500);
+        return $app->json(array('errorCode' => 1, 'errorMessage' => 'Unable to move uploaded file on server'), 500);
     }
 
     try {
@@ -94,19 +92,24 @@ $post = function(Request $request) use ($app, $error) {
         $string = $converter->toBase64();
         return new Response($string, 200);
     } catch(Exception $e) {
-        return $error($e->getMessage(), 500);
+        return $app->json(array('errorCode' => 1, 'errorMessage' => $e->getMessage()), 500);
     }
 };
-$after = function(Request $request, Response $response) use ($app, $error) {
-    // duration
-    $duration = (microtime(true) - $app['start']);
+$after = function(Request $request, Response $response) use ($app) {
+    if ($response->getStatusCode() == 200) {
+        // duration
+        $duration = (isset($app['start'])) ? (microtime(true) - $app['start']): null;
 
-    // log in database
-    $data = array(
-        'duration' => round($duration, 4), // in ms
-        'success'  => 1,
-    );
-    $app['cm']->update($data, array( 'id' => $app['request_id'] ));
+        // log in database
+        $data = array(
+            'duration' => round($duration, 4), // in ms
+            'success'  => 1,
+        );
+        $app['cm']->update($data, array( 'id' => $app['request_id'] ));
+    } else {
+        if (isset($app['request_id']))
+            $app['cm']->update(array( 'error' => $response->getContent() ), array( 'id' => $app['request_id'] ));
+    }
 };
 
 $app->post('/convert', $post)
