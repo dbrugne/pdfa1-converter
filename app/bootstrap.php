@@ -25,6 +25,7 @@ $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
 // configuration
 $app['input'] = __DIR__.'/../var/input/';
 $app['output'] = __DIR__.'/../var/output/';
+$app['key'] = 'cledetestsecurite';
 
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => __DIR__.'/../views',
