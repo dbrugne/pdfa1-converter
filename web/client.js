@@ -29,30 +29,30 @@ if (supportAjaxUploadWithProgress()) {
     var uploadBtn = document.getElementById('upload-button-id');
     notice.innerHTML = "Your browser supports HTML uploads. Go try me! :-)";
     uploadBtn.removeAttribute('disabled');
-    // Init the Ajax form submission
-    initFullFormAjaxUpload();
+    //// Init the Ajax form submission
+    //initFullFormAjaxUpload();
     // Init the single-field file upload
     initFileOnlyAjaxUpload();
 }
-function initFullFormAjaxUpload() {
-    var form = document.getElementById('form-id');
-    form.onsubmit = function() {
-        // FormData receives the whole form
-        var formData = new FormData(form);
-        // We send the data where the form wanted
-        var action = form.getAttribute('action');
-        // Code common to both variants
-        sendXHRequest(formData, action);
-        // Avoid normal form submission
-        return false;
-    }
-}
+//function initFullFormAjaxUpload() {
+//    var form = document.getElementById('form-id');
+//    form.onsubmit = function() {
+//        // FormData receives the whole form
+//        var formData = new FormData(form);
+//        // We send the data where the form wanted
+//        var action = form.getAttribute('action');
+//        // Code common to both variants
+//        sendXHRequest(formData, action);
+//        // Avoid normal form submission
+//        return false;
+//    }
+//}
 function initFileOnlyAjaxUpload() {
     var uploadBtn = document.getElementById('upload-button-id');
     uploadBtn.onclick = function (evt) {
         var formData = new FormData();
         // Since this is the file only, we send it to a specific location
-        var action = '/convert';
+        var action = '/convert'; // ?key=cledetestsecurite&store_id=44x
         // FormData only has the file
         var fileInput = document.getElementById('file-id');
         var file = fileInput.files[0];
@@ -131,12 +131,38 @@ function updateList() {
         if (!list.length)
           return;
 
-        var html = '<table><thead><tr><td>id</td><td>original_name</td><td>original_size</td><td>original_type</td><td>current_name</td><td>current_path</td><td>validation</td><td>from_ip</td><td>created_at</td></tr></thead><tbody>';
+        var colums = [
+            'id',
+            'local_name',
+            'date',
+            'from_store_id',
+            'from_ip',
+            'original_name',
+            'original_size',
+            'original_type',
+            'duration',
+            'success',
+            'error'
+        ];
+
+        var html = '<table><thead><tr>';
+        _.each(colums, function(c) {
+            html += '<td>'+c+'</td>';
+        });
+        html += '<td>actions</td></tr></thead><tbody>';
         for(var i=0; i<list.length; i++) {
             var item = list[i];
-            html += '<tr><td>'+item.id+'</td><td>'+item.original_name+'</td><td>'+item.original_size+'</td><td>'+item.original_type+'</td><td>'+item.current_name+'</td><td>'+item.current_path+'</td><td><a href="#_" class="validate" data-current-name="'+item.current_name+'">valid</a></td><td>'+item.from_ip+'</td><td>'+item.created_at+'</td></tr>';
+            html += '<tr>';
+            _.each(colums, function(c) {
+                html += '<td>';
+                if (item.hasOwnProperty(c)) {
+                    html += item[c];
+                }
+                html += '</td>';
+            });
+            html += '<td><a href="#_" class="validate" data-current-name="'+item.current_name+'">valid</a></td>';
+            html += '</tr>';
         }
-
         html += '</tbody></table>';
         $('#list-container').empty();
         $('#list-container').html(html);
@@ -168,6 +194,10 @@ $(document).on('ready', function() {
             }
             $(event.currentTarget).closest('td').html(html);
         });
+    });
+
+    $('.refresh').click(function(event) {
+        updateList();
     });
 
     // load list
