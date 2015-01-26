@@ -45,7 +45,7 @@ Full example:
 ```
 cd test
 rm temp.1.txt temp.2.pdf
-curl --form "source=@samples/22369_1.pdf" --form key=cledetestsecurite --form store_id=44x --output temp.1.txt http://localhost/convert
+curl --form "source=@samples/d926.pdf" --form key=cledetestsecurite --form store_id=445 --output temp.1.txt http://localhost:8080/convert
 certutil -decode temp.1.txt temp.2.pdf
 C:\www\jhove\jhove -l OFF -h xml temp.2.pdf
 ```
