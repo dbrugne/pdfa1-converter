@@ -13,22 +13,30 @@ use
 $app = new Application;
 $app['debug'] = true;
 
+/**
+ * Configuration provider
+ */
+$app->register(new DerAlex\Silex\YamlConfigServiceProvider(__DIR__.'/../etc/config.yml')); // should be linked (ln) on each environment
+$app['input'] = __DIR__.'/../var/input/';
+$app['output'] = __DIR__.'/../var/output/';
+
+/**
+ * Doctrine provider
+ */
 $app->register(new Silex\Provider\DoctrineServiceProvider(), array(
     'db.options' => array(
-        'dbname'    => 'pdfa1',
-        'user'      => 'root',
-        'password'  => 'root',
-        'host'      => 'localhost',
+        'dbname'    => $app['config']['database']['dbname'],
+        'user'      => $app['config']['database']['user'],
+        'password'  => $app['config']['database']['password'],
+        'host'      => $app['config']['database']['host'],
         'driver'    => 'pdo_mysql',
     ),
 ));
-
-// configuration
-$app['input'] = __DIR__.'/../var/input/';
-$app['output'] = __DIR__.'/../var/output/';
-$app['key'] = 'cledetestsecurite';
 $app['cm'] = new ConversionManager($app);
 
+/**
+ * Twig provider
+ */
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => __DIR__.'/../views',
 ));

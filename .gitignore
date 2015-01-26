@@ -5,6 +5,9 @@ composer.phar
 vendor/
 composer.lock
 
+# configuration
+etc/config.yml
+
 # test
 test/samples/
 test/temp.*

@@ -1,0 +1,7 @@
+security:
+    key: cledetestsecurite
+database:
+    host: 127.0.0.1
+    dbname: scor
+    user: root
+    password:

@@ -13,7 +13,8 @@
     "silex/silex": "v1.2.2",
     "twig/twig": "v1.16.3",
     "symfony/twig-bridge": "v2.6.1",
-    "doctrine/dbal": "v2.5.0"
+    "doctrine/dbal": "v2.5.0",
+    "deralex/yaml-config-service-provider": "1.0.*@dev"
   },
   "autoload": {
     "psr-0": { "Eyefinity": "src/" }

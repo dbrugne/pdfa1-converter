@@ -49,7 +49,7 @@ $before = function(Request $request) use ($app) {
     $key = $request->request->get('key');
     if (!$key)
         return $app->json(array('errorCode' => 1, 'errorMessage' => 'Security key not found'), 403);
-    if ($app['key'] !== $key)
+    if ($app['config']['security']['key'] !== $key)
         return $app->json(array('errorCode' => 1, 'errorMessage' => 'Security key mismatch'), 403);
     if (!$request->files->has('source'))
         return $app->json(array('errorCode' => 1, 'errorMessage' => 'POST request should contains a "source" param'), 400);
