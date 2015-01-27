@@ -10,6 +10,8 @@ use
     Eyefinity\Application,
     Eyefinity\Model\ConversionManager;
 
+use Knp\Provider\ConsoleServiceProvider;
+
 $app = new Application;
 $app['debug'] = true;
 
@@ -39,6 +41,15 @@ $app['cm'] = new ConversionManager($app);
  */
 $app->register(new Silex\Provider\TwigServiceProvider(), array(
     'twig.path' => __DIR__.'/../views',
+));
+
+/**
+ * Console provider
+ */
+$app->register(new ConsoleServiceProvider(), array(
+    'console.name' => 'ScorApp',
+    'console.version' => '1.0.0',
+    'console.project_directory' => __DIR__ . '/..'
 ));
 
 return $app;
