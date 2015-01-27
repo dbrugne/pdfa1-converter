@@ -12,6 +12,7 @@ A small service in Silex/PHP to convert PDF files in PDF/A-1 valid documents.
 * MySQL autoclean (<3 months)
 * Add remove files option for production cleanup, errored file go in specific dir
 * Add SSL
+* Add parameter to disabled client
 
 # API
 
