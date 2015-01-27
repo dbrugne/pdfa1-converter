@@ -13,47 +13,45 @@ class Validator {
     }
 
     protected function _cmd($options, $from) {
-        if (PHP_OS == 'WINNT') {
-            // Windows
-            $cmd = '"'.'C:\www\jhove\jhove'.'"';
-            $cmd .= ' ' . $options;
-            $cmd .= " {$from}";
-        } else {
-            // Linux
-            $cmd = 'gs';
-            $cmd .= ' ' . $options;
-            $cmd .= ' '.escapeshellcmd($from);
-        }
+
+
         return $cmd;
     }
 
-    protected function _exec($cmd) {
-        return shell_exec($cmd);
+    protected function _jhove() {
+        // Linux only
+        $cmd = '/www/jhove/jhove';
+        $cmd .= ' -l OFF -h XML ';
+        $cmd .= ' '.escapeshellcmd($this->file);
+        $result = shell_exec($cmd);
+        if ($result === null) {
+            throw new \Exception('Unable to execute JHOVE validation or to obtain an output result');
+        }
+
+        return new \SimpleXMLElement($result);
     }
 
     /**
-     * @doc: http://jhove.sourceforge.net/using.html
+     * @doc: https://bitbucket.org/jhove2/main/wiki/Home
      */
     public function validatePDFA1() {
+        if (PHP_OS == 'WINNT') {
+            return array();
+        }
         if (!file_exists($this->file)) {
             return array();
         }
 
-        $cmd = $this->_cmd(" -l OFF -h xml ", $this->file);
-        $xml = $this->_exec($cmd);
-        if ($xml === null) {
-            throw new Exception('Unable to execute JHOVE validation or to obtain an output result');
-        }
-        $validation = new \SimpleXMLElement($xml);
-        $output = array(
-            'status' => (string)$validation->repInfo->status,
-            'profile' => (string)$validation->repInfo->profiles->profile,
-            'result' => false
-        );
-        if ($output['status'] == 'Well-Formed and valid' && $output['profile'] == 'ISO PDF/A-1, Level B') {
-            $output['result'] = true;
-        }
-        return $output;
+        $jhove = $this->_jhove();
+        $status = ($jhove->repInfo->status == 'Well-Formed and valid')
+            ? true
+            : false;
+
+        $isPDFA1 = ($jhove->repInfo->profiles && $jhove->repInfo->profiles->profile && $jhove->repInfo->profiles->profile == 'ISO PDF/A-1, Level B')
+            ? true
+            : false;
+
+        return ($status && $isPDFA1) ? true : false;
     }
 
 }

@@ -41,22 +41,21 @@ class Test extends Command {
 
             // original format
             $validator = new Validator($app, 'samples/'.$entry);
-            //$validator->validatePDFA1();
+            $output->write("\t before:".(($validator->validatePDFA1())?'OK':'NOK'));
 
             // clean
             @unlink($dir.'/temp.pdf');
-            //@unlink($dir.'/temp_base64.txt');
 
             // convert
-            //$r = shell_exec('curl --form "source=@samples/d926.pdf" --form key=cledetestsecurite --form store_id=445 --output temp_base64.txt http://localhost:8080/convert');
-            $ascii = shell_exec('curl --form "source=@samples/d926.pdf" --form key=cledetestsecurite --form store_id=445 http://localhost:8080/convert');
+            $ascii = shell_exec('curl --silent --form "source=@samples/d926.pdf" --form key=cledetestsecurite --form store_id=445 http://localhost:8080/convert');
             file_put_contents('temp.pdf', base64_decode($ascii));
 
             // test
-            // @todo
+            $validator = new Validator($app, 'temp.pdf');
+            $output->write("\t after:".(($validator->validatePDFA1())?'OK':'NOK'));
 
             $output->writeln(''); // \n
-            if ($count >= 5)
+            if ($count >= 1000)
                 break;
         }
         $output->writeln($count." found");
