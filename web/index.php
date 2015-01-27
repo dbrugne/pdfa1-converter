@@ -83,7 +83,7 @@ $post = function(Request $request) use ($app) {
     try {
         $localFile = $file->move($app['input'],  $app['request_local'] . '.pdf');
     } catch (Exception $e) {
-        return $app->json(array('errorCode' => 1, 'errorMessage' => 'Unable to move uploaded file on server'), 500);
+        return $app->json(array('errorCode' => 1, 'errorMessage' => 'Unable to move uploaded file on server ('.$e->getMessage().')'), 500);
     }
 
     try {
