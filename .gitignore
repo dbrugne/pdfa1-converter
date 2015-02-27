@@ -15,3 +15,4 @@ test/temp.*
 
 # var files
 var/
+log/
