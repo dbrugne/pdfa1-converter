@@ -21,6 +21,7 @@ $app['debug'] = true;
 $app->register(new DerAlex\Silex\YamlConfigServiceProvider(__DIR__.'/../etc/config.yml')); // should be linked (ln) on each environment
 $app['input'] = __DIR__.'/../var/input/';
 $app['output'] = __DIR__.'/../var/output/';
+$app['lib'] = __DIR__.'/../lib/';
 if (!file_exists($app['input'])) {
     mkdir($app['input'], 0777, true);
 }

@@ -12,21 +12,6 @@ class Converter {
         $this->key = $key;
     }
 
-    protected function _cmd($options, $from, $to) {
-        if (PHP_OS == 'WINNT') {
-            // Windows
-            $cmd = '"'.'C:\Program Files (x86)\gs\gs9.15\bin\gswin32c.exe'.'"';
-            $cmd .= ' ' . $options;
-            $cmd .= " -sOutputFile={$to} {$from}";
-        } else {
-            // Linux
-            $cmd = 'gs';
-            $cmd .= ' ' . $options;
-            $cmd .= " -sOutputFile=".escapeshellcmd($to)." ".escapeshellcmd($from);
-        }
-        return $cmd;
-    }
-
     protected function _exec($cmd) {
         return shell_exec($cmd);
     }
@@ -37,7 +22,12 @@ class Converter {
     public function toPDFA1() {
         $from = $this->app['input'] . $this->key . '.pdf';
         $to = $this->app['output'] . $this->key . '.pdf';
-        $cmd = $this->_cmd(" -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite -sColorConversionStrategy=Mono -sColorConversionStrategyForImages=Mono -dUseCIEColor -sProcessColorModel=DeviceGray", $from, $to);
+
+        // prepare commande (Linux only)
+        $profile = $this->app['lib']."PDFA_def.ps";
+        $cmd = "gs -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -dUseCIEColor -sProcessColorModel=DeviceGray -sColorConversionStrategy=Mono -sColorConversionStrategyForImages=Mono -sDEVICE=pdfwrite ";
+        $cmd .= " -sOutputFile=".escapeshellarg($to)." ".escapeshellarg($profile)." ".escapeshellarg($from);
+
         return $this->_exec($cmd);
     }
 
