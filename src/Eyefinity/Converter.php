@@ -13,7 +13,16 @@ class Converter {
     }
 
     protected function _exec($cmd) {
-        return shell_exec($cmd);
+        $output = array();
+        $return_var = 0;
+        exec($cmd, $output, $return_var);
+        if ($return_var != 0) {
+            $this->app['monolog']->addError(sprintf("Error while executing: %s", $cmd));
+            $this->app['monolog']->addError(sprintf(implode('\n', $output));
+            throw new Exception('Error while executing conversion, see logs');
+        }
+
+        return;
     }
 
     /**
@@ -28,7 +37,7 @@ class Converter {
         $cmd = "gs -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sProcessColorModel=DeviceGray -sColorConversionStrategy=Mono -sColorConversionStrategyForImages=Mono -sDEVICE=pdfwrite ";
         $cmd .= " -sOutputFile=".escapeshellarg($to)." ".escapeshellarg($profile)." ".escapeshellarg($from);
 
-        return $this->_exec($cmd);
+        $this->_exec($cmd);
     }
 
     public function toBase64() {

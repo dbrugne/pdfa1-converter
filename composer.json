@@ -15,7 +15,8 @@
     "symfony/twig-bridge": "v2.6.1",
     "doctrine/dbal": "v2.5.0",
     "deralex/yaml-config-service-provider": "1.0.*@dev",
-    "knplabs/console-service-provider": "dev-master"
+    "knplabs/console-service-provider": "dev-master",
+    "monolog/monolog": "1.13.*@dev"
   },
   "autoload": {
     "psr-0": { "Eyefinity": "src/" }
