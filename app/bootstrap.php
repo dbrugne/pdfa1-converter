@@ -33,8 +33,8 @@ if (!file_exists($app['output'])) {
  * Monolog provider
  */
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
-    'monolog.name' => 'pdfa1-converter',
-    'monolog.logfile' => __DIR__.'/var/conversions.log',
+    'monolog.name'    => 'pdfa1-converter',
+    'monolog.logfile' => __DIR__.'/log/conversions.log',
 ));
 
 /**
