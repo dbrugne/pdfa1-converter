@@ -5,3 +5,4 @@ database:
     dbname: scor
     user: root
     password:
+icc: PDFA_dev.ps

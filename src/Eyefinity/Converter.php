@@ -24,7 +24,7 @@ class Converter {
         $to = $this->app['output'] . $this->key . '.pdf';
 
         // prepare commande (Linux only)
-        $profile = $this->app['lib']."PDFA_def.ps";
+        $profile = $this->app['lib'] . $this->app['config']['icc'];
         $cmd = "gs -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -dUseCIEColor -sProcessColorModel=DeviceGray -sColorConversionStrategy=Mono -sColorConversionStrategyForImages=Mono -sDEVICE=pdfwrite ";
         $cmd .= " -sOutputFile=".escapeshellarg($to)." ".escapeshellarg($profile)." ".escapeshellarg($from);
 
