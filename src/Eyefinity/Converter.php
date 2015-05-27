@@ -18,7 +18,7 @@ class Converter {
         exec($cmd, $output, $return_var);
         if ($return_var != 0) {
             $this->app['monolog']->addError(sprintf("Error while executing: %s", $cmd));
-            $this->app['monolog']->addError(sprintf(implode('\n', $output));
+            $this->app['monolog']->addError(sprintf(implode('\n', $output)));
             throw new Exception('Error while executing conversion, see logs');
         }
 
