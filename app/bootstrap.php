@@ -34,7 +34,7 @@ if (!file_exists($app['output'])) {
  */
 $app->register(new Silex\Provider\MonologServiceProvider(), array(
     'monolog.name'    => 'pdfa1-converter',
-    'monolog.logfile' => __DIR__.realpath('/../log').'/conversions.log',
+    'monolog.logfile' => realpath(__DIR__.'/../log').'/conversions.log',
 ));
 
 /**
