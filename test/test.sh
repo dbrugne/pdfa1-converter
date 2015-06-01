@@ -6,8 +6,11 @@ KEY=DFFSDLdfds34564574fdsfs464567FDGFDGgdffdgdDFg54353345345zre
 #FQDN=localhost:8080
 #KEY=cledetestsecurite
 
-MAX=1
-COUNT=1
+MAX=2000
+PROCESSED=1
+SUCCESS=0
+ERRORC=0
+
 
 if [ ! -d "out" ]
 then
@@ -17,7 +20,7 @@ else
 fi
 for i in ./samples/*.pdf; do
     
-    echo "["$COUNT"] Now working on "$i
+    echo "["$PROCESSED"] Now working on "$i
     filename=${i:10}
     outfilename='./out/'$filename
     b64filename=$outfilename'.b64'
@@ -40,17 +43,21 @@ for i in ./samples/*.pdf; do
 	then
 	    echo -e "  = Valid!"
 	    rm $xmlfilename
+
+	    SUCCESS=$(( SUCCESS + 1 ))
 	else
 		echo -e "  = ERROR:"
 		echo -e "  ! $status"
 		echo -e "  ! $profile"
+
+		ERRORC=$(( ERRORC + 1 ))
 	fi
 
-    COUNT=$(( $COUNT + 1 ))
-    if [[ $COUNT -gt $MAX ]]; then
+    PROCESSED=$(( PROCESSED + 1 ))
+    if [[ $PROCESSED -gt $MAX ]]; then
       break;
     fi
 
 done
 
-echo "Done "$(( $COUNT - 1 ))" files"
+echo "Done "$(( $SUCCESS ))" file(s) with "$ERRORC" error(s)"
