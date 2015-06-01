@@ -34,7 +34,7 @@ class Converter {
 
         // prepare commande (Linux only)
         $profile = $this->app['lib'] . $this->app['config']['icc'];
-        $cmd = 'gs -r200 -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite -c "/osetcolor {/setcolor} bind def /setcolor {pop [0 0 0] osetcolor} def"';
+        $cmd = "gs -r200 -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sProcessColorModel=DeviceGray -sColorConversionStrategy=Mono -sColorConversionStrategyForImages=Mono -sDEVICE=pdfwrite ";
         $cmd .= " -sOutputFile=".escapeshellarg($to)." ".escapeshellarg($profile)." ".escapeshellarg($from);
 
         $this->_exec($cmd);
