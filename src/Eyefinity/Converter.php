@@ -19,7 +19,7 @@ class Converter {
         if ($return_var != 0) {
             $this->app['monolog']->addError(sprintf("Error while executing: %s", $cmd));
             $this->app['monolog']->addError(sprintf(implode('\n', $output)));
-            throw new Exception('Error while executing conversion, see logs');
+            throw new \Exception('Error while executing conversion, see logs');
         }
 
         return;
@@ -34,7 +34,7 @@ class Converter {
 
         // prepare commande (Linux only)
         $profile = $this->app['lib'] . $this->app['config']['icc'];
-        $cmd = "gs -r200 -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sProcessColorModel=DeviceGray -sColorConversionStrategy=Mono -sColorConversionStrategyForImages=Mono -sDEVICE=pdfwrite ";
+        $cmd = 'gs -r200 -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite -c "/osetcolor {/setcolor} bind def /setcolor {pop [0 0 0] osetcolor} def"';
         $cmd .= " -sOutputFile=".escapeshellarg($to)." ".escapeshellarg($profile)." ".escapeshellarg($from);
 
         $this->_exec($cmd);
