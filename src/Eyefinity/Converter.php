@@ -12,6 +12,9 @@ class Converter {
         $this->key = $key;
     }
 
+    /**
+     * Works on Linux/MacOS/UNIX only
+     */
     protected function _exec($cmd) {
         $output = array();
         $return_var = 0;
@@ -30,13 +33,17 @@ class Converter {
      */
     public function toPDFA1() {
         $from = $this->app['input'] . $this->key . '.pdf';
+        $ps = $this->app['output'] . $this->key . '.ps';
         $to = $this->app['output'] . $this->key . '.pdf';
 
-        // prepare commande (Linux only)
-        $profile = $this->app['lib'] . $this->app['config']['icc'];
-        $cmd = "gs -r200 -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sProcessColorModel=DeviceGray -sColorConversionStrategy=Mono -sColorConversionStrategyForImages=Mono -sDEVICE=pdfwrite ";
-        $cmd .= " -sOutputFile=".escapeshellarg($to)." ".escapeshellarg($profile)." ".escapeshellarg($from);
+        // PDF to back & white PS
+        $cmd = "gs -sDEVICE=psmono -dNOPAUSE -dBATCH -dSAFER -sOutputFile=".$ps." ".escapeshellarg($from); // psmono||ps2write
+        $this->_exec($cmd);
 
+        // PS to PDFA1
+        $profile = $this->app['lib'] . $this->app['config']['icc'];
+        $cmd = "gs -r200 -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite";
+        $cmd .= " -sOutputFile=".escapeshellarg($to)." ".escapeshellarg($profile)." ".escapeshellarg($ps);
         $this->_exec($cmd);
     }
 
