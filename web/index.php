@@ -89,6 +89,7 @@ $post = function(Request $request) use ($app) {
     try {
         $converter = new Converter($app, $app['request_local']);
         $converter->toPDFA1(); // to PDF/A-1b
+        $converter->checkSize(); // to PDF/A-1b
         $string = $converter->toBase64();
         return new Response($string, 200);
     } catch(Exception $e) {

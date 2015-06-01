@@ -47,6 +47,15 @@ class Converter {
         $this->_exec($cmd);
     }
 
+    public function checkSize() {
+        $from = $this->app['output'] . $this->key . '.pdf';
+        $size = filesize ($from);
+        if ($size <= 0)
+            throw new \Exception('After conversion file is empty, original file was probably malformed');
+        if ($size > 250*1024)
+            throw new \Exception('After conversion file is too large, original document was too large');
+    }
+
     public function toBase64() {
         $from = $this->app['output'] . $this->key . '.pdf';
         $base64 = base64_encode(file_get_contents($from));
