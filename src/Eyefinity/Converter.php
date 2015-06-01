@@ -37,12 +37,12 @@ class Converter {
         $to = $this->app['output'] . $this->key . '.pdf';
 
         // PDF to back & white PS
-        $cmd = "gs -sDEVICE=psmono -dNOPAUSE -dBATCH -dSAFER -sOutputFile=".$ps." ".escapeshellarg($from); // psmono||ps2write
+        $cmd = "gs -dSAFER -dBATCH -dNOPAUSE -sDEVICE=psmono -sOutputFile=".$ps." ".escapeshellarg($from); // psmono||ps2write
         $this->_exec($cmd);
 
         // PS to PDFA1
         $profile = $this->app['lib'] . $this->app['config']['icc'];
-        $cmd = "gs -r200 -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -sDEVICE=pdfwrite";
+        $cmd = "gs -dBATCH -dNOPAUSE -r150 -dPDFA -dNOOUTERSAVE -sProcessColorModel=DeviceGray -sDEVICE=pdfwrite";
         $cmd .= " -sOutputFile=".escapeshellarg($to)." ".escapeshellarg($profile)." ".escapeshellarg($ps);
         $this->_exec($cmd);
     }
