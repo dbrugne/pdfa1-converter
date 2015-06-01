@@ -6,7 +6,7 @@ KEY=DFFSDLdfds34564574fdsfs464567FDGFDGgdffdgdDFg54353345345zre
 #FQDN=localhost:8080
 #KEY=cledetestsecurite
 
-MAX=100
+MAX=1000
 PROCESSED=1
 SUCCESS=0
 ERRORC=0
@@ -23,11 +23,9 @@ for i in ./samples/*.pdf; do
     echo "["$PROCESSED"] Now working on "$i
     filename=${i:10}
     outfilename='./out/'$filename
-    #b64filename=$outfilename'.b64'
     xmlfilename=outfilename'.xml'
 
     # conversion
-    #curl --silent -X POST -F source=@$i -F key=$KEY -F store_id=testeyefinity -o $b64filename --url "http://$FQDN/convert"
     # @source: http://stackoverflow.com/questions/2220301/how-to-evaluate-http-response-codes-from-bash-shell-script
     RESPONSE=$(curl --write-out \\n%{http_code} --silent --output - -X POST -F source=@$i -F key=$KEY -F store_id=testeyefinity --url "http://$FQDN/convert")
 
@@ -39,9 +37,7 @@ for i in ./samples/*.pdf; do
         echo '  + '$filename' converted'
 
         # base64_decode
-        #cat $b64filename | base64 --decode > $outfilename
         echo $B64 | base64 --decode > $outfilename
-        #rm $b64filename
         echo '  + '$filename' decoded'
 
         # JHOVE validation
