@@ -42,7 +42,7 @@ class Converter {
 
         // PS to PDFA1
         $profile = $this->app['lib'] . $this->app['config']['icc'];
-        $cmd = "gs -dBATCH -dNOPAUSE -r150 -dPDFA -dNOOUTERSAVE -sProcessColorModel=DeviceGray -sDEVICE=pdfwrite";
+        $cmd = "gs -dBATCH -dNOPAUSE -r150 -dPDFA -dNOOUTERSAVE -sProcessColorModel=DeviceGray -sDEVICE=pdfwrite -dDownsampleMonoImages=true -dMonoImageResolution=150 ";
         $cmd .= " -sOutputFile=".escapeshellarg($to)." ".escapeshellarg($profile)." ".escapeshellarg($ps);
         $this->_exec($cmd);
     }
