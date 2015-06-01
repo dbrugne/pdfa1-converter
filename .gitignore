@@ -11,7 +11,7 @@ etc/config.yml
 
 # test
 test/samples/
-test/temp.*
+test/out/
 
 # var files
 var/
