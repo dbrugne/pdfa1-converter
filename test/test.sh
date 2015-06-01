@@ -1,13 +1,12 @@
 #!/bin/bash
 
-#FQDN=scor.eyefinity.fr
-#KEY=xxx
+FQDN=scor.eyefinity.fr
+KEY=DFFSDLdfds34564574fdsfs464567FDGFDGgdffdgdDFg54353345345zre
 
-FQDN=localhost:8080
-KEY=cledetestsecurite
+#FQDN=localhost:8080
+#KEY=cledetestsecurite
 
-
-MAX=10
+MAX=1
 COUNT=1
 
 if [ ! -d "out" ]
