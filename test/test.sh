@@ -6,7 +6,7 @@ KEY=DFFSDLdfds34564574fdsfs464567FDGFDGgdffdgdDFg54353345345zre
 #FQDN=localhost:8080
 #KEY=cledetestsecurite
 
-MAX=2000
+MAX=100
 PROCESSED=1
 SUCCESS=0
 ERRORC=0
@@ -23,35 +23,52 @@ for i in ./samples/*.pdf; do
     echo "["$PROCESSED"] Now working on "$i
     filename=${i:10}
     outfilename='./out/'$filename
-    b64filename=$outfilename'.b64'
+    #b64filename=$outfilename'.b64'
     xmlfilename=outfilename'.xml'
 
     # conversion
-    curl --silent -X POST -F source=@$i -F key=$KEY -F store_id=testeyefinity -o $b64filename --url "http://$FQDN/convert"
-    echo '  + '$filename' converted'
+    #curl --silent -X POST -F source=@$i -F key=$KEY -F store_id=testeyefinity -o $b64filename --url "http://$FQDN/convert"
+    # @source: http://stackoverflow.com/questions/2220301/how-to-evaluate-http-response-codes-from-bash-shell-script
+    RESPONSE=$(curl --write-out \\n%{http_code} --silent --output - -X POST -F source=@$i -F key=$KEY -F store_id=testeyefinity --url "http://$FQDN/convert")
 
-    # base64_decode
-    cat $b64filename | base64 --decode > $outfilename
-    rm $b64filename
-    echo '  + '$filename' decoded'
+    CODE=$(echo "$RESPONSE" | tail -n1)
+    B64=$(echo "$RESPONSE" | sed \$d)
 
-    /www/jhove/jhove -l OFF -h XML $outfilename > $xmlfilename
-    status="$(xpath $xmlfilename '/jhove/repInfo/status/text()' 2> /dev/null)" # Well-Formed and valid
-    profile="$(xpath $xmlfilename '/jhove/repInfo/profiles/profile/text()' 2> /dev/null)" # ISO PDF/A-1, Level B
+    if [[ ("$CODE" = "200") ]]
+    then
+        echo '  + '$filename' converted'
 
-	if [[ ("$status" = "Well-Formed and valid") && ("$profile" = "ISO PDF/A-1, Level B") ]]
-	then
-	    echo -e "  = Valid!"
-	    rm $xmlfilename
+        # base64_decode
+        #cat $b64filename | base64 --decode > $outfilename
+        echo $B64 | base64 --decode > $outfilename
+        #rm $b64filename
+        echo '  + '$filename' decoded'
 
-	    SUCCESS=$(( SUCCESS + 1 ))
-	else
-		echo -e "  = ERROR:"
-		echo -e "  ! $status"
-		echo -e "  ! $profile"
+        # JHOVE validation
+        /www/jhove/jhove -l OFF -h XML $outfilename > $xmlfilename
+        status="$(xpath $xmlfilename '/jhove/repInfo/status/text()' 2> /dev/null)" # Well-Formed and valid
+        profile="$(xpath $xmlfilename '/jhove/repInfo/profiles/profile/text()' 2> /dev/null)" # ISO PDF/A-1, Level B
 
-		ERRORC=$(( ERRORC + 1 ))
-	fi
+        if [[ ("$status" = "Well-Formed and valid") && ("$profile" = "ISO PDF/A-1, Level B") ]]
+        then
+            echo -e "  = Valid!"
+            rm $xmlfilename
+
+            SUCCESS=$(( SUCCESS + 1 ))
+        else
+            echo -e "  = JHOVE VALIDATION ERROR:"
+            echo -e "  ! $status"
+            echo -e "  ! $profile"
+
+            ERRORC=$(( ERRORC + 1 ))
+        fi
+    else
+        echo -e "  = SCOR CONVERSION ERROR:"
+        echo -e "  ! $CODE"
+        echo -e "  ! $RESPONSE"
+
+        ERRORC=$(( ERRORC + 1 ))
+    fi
 
     PROCESSED=$(( PROCESSED + 1 ))
     if [[ $PROCESSED -gt $MAX ]]; then
