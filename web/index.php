@@ -26,7 +26,7 @@ $app->get('/list', function() use($app) {
     $clean = array();
     foreach($raw as $item) {
         $newItem = $item->getData();
-        $newItem['current_path'] = $app['output'].$item->getCurrentName().'.pdf';
+        $newItem['current_path'] = $app['output'].$item->getLocalName().'.pdf';
         $clean[] = $newItem;
     }
     return $app->json($clean, 200);
