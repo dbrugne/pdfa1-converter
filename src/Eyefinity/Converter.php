@@ -65,4 +65,20 @@ class Converter {
         return $base64;
     }
 
+    public function cleanTempFiles() {
+        $fileNames = array(
+            $this->app['input'] . $this->key . '.pdf',
+            $this->app['output'] . $this->key . '.ps',
+            $this->app['output'] . $this->key . '.pdf',
+        );
+
+        foreach ($fileNames as $localFile) {
+            try {
+                unlink($localFile);
+            } catch (Exception $e) {
+                $this->app['monolog']->addError(sprintf("Error while unlinking: %s", $localFile));
+            }
+        }
+    }
+
 }

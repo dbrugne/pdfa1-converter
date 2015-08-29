@@ -91,6 +91,9 @@ $post = function(Request $request) use ($app) {
         $converter->toPDFA1(); // to PDF/A-1b
         $converter->checkSize(); // to PDF/A-1b
         $string = $converter->toBase64();
+        if ($app['config']['autoclean']) {
+            $converter->cleanTempFiles();
+        }
         return new Response($string, 200);
     } catch(Exception $e) {
         return $app->json(array('errorCode' => 1, 'errorMessage' => $e->getMessage()), 500);

@@ -6,3 +6,4 @@ database:
     user: root
     password:
 icc: PDFA_dev.ps
+autoclean: false
